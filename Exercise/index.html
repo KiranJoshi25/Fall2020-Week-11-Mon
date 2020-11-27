@@ -42,7 +42,7 @@
         path.path_geo{
             stroke-width: 1px;
             stroke: rgb(0,0,0);
-            fill-opacity: .8;
+            fill-opacity: 1;
         }
         .gop{
             fill: none;
@@ -70,8 +70,6 @@
 <div id="caption">
     US Election Results by State.
 </div>
-
-
 <div id="container">
     <svg id="canvas" width="100vw" height="100vh" viewBox="0 0 1000 800">
     </svg>
@@ -86,14 +84,9 @@
 <script>
     let dem_color = "rgb(139,0,0)"
     let gop_color = "rgb(66,101,180)"
-
-    // load the data sources:
-    // source 1
     let AGGREGATE_2020 = "https://raw.githubusercontent.com/KiranJoshi25/Fall2020-Week-11-Mon/main/Exercise/US_ELECT_Aggregate.csv"
     let past_elect = "https://raw.githubusercontent.com/KiranJoshi25/Fall2020-Week-11-Mon/main/Exercise/US_elect_previous.csv"
-    // source 2: US Census Counties geojson
     let geojson = "https://raw.githubusercontent.com/KiranJoshi25/Fall2020-Week-6-Mon/master/Exercise_D3_COVID_19_States_MAP/TopoJson.json";
-
     Promise.all(
         [
             d3.json(geojson),
@@ -109,8 +102,6 @@
             .scale(1200).translate([width/2, 2*height/5])
         let geoJson = topojson.feature(data[0], data[0].objects.cb_2018_us_state_20m).features;
         let geo_generator = d3.geoPath().projection(projection);
-
-        // Step 5: first load 2008 to 2016 data into dictionary
         let election_data = {}
         d3.map(data[1],function (d) {election_data[d.state_name] =
             {   name: d.state_name,
@@ -154,10 +145,6 @@
                     .style("left",(mouseData.clientX+10).toString()+"px")
                     .style("top",(mouseData.clientY+10).toString()+"px")
             })
-
-
-
-
         svg.call(d3.zoom()
             .extent([[0,0],[1000,1000]])
             .scaleExtent([1,12])
@@ -166,8 +153,6 @@
         function zoomed({transform}){
             mapCanvas.attr("transform",transform)
         }
-
-
         function tooltip_html(fips){
             let margin={x:30,y:0}
             let plot_height = 90
@@ -186,7 +171,6 @@
                 });
             let demsLine = lineGenerator(history_dems);
             let gopLine = lineGenerator(history_gop);
-
             let svg_tooltip = d3.select("#svg_tooltop")
             svg_tooltip.selectAll('g').remove()
             svg_tooltip.append('g').attr("transform",`translate(${margin.x},${margin.y})`)
@@ -195,31 +179,18 @@
                 .attr('y',1)
                 .text(election_data[fips]['name'])
                 .attr("class","county_name")
-
             svg_tooltip.selectAll('g').append('path').attr("d",demsLine).attr("class","dems")
             svg_tooltip.selectAll('g').append('path').attr("d",gopLine).attr("class","gop")
-
-            // formatting numbers in y axis to look human readable:
             let formatValue = d3.format(".2s");
-            // x and y Axis function
             let x_axis = d3.axisBottom(xScale).ticks(4)
             let y_axis = d3.axisLeft(yScale).ticks(4).tickFormat(function(d) { return formatValue(d)});
-            //X Axis
             svg_tooltip.append("g").attr("class","axis")
                 .attr("transform", `translate(${margin.x},${plot_height})`)
                 .call(x_axis)
-            // Y Axis
             svg_tooltip.append("g").attr("class","axis")
                 .attr("transform", `translate(${margin.x},${0})`)
                 .call(y_axis)
-
-
         }}
-
-
-
-
-
 </script>
 </body>
 </html>
